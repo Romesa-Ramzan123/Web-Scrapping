@@ -1,0 +1,44 @@
+
+#import important libraries
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+#create an object to fetch HTML from a webpage
+
+response = requests.get('https://urdu.geo.tv/category/entertainment')
+
+#call different functions associated with the (reponse) object
+
+response.status_code
+response.content
+response.text
+response.headers
+response.headers['Server']
+
+#use BeautifulSoup and html5lib to parse HTML text
+soup=BeautifulSoup(response.text,'html.parser')
+# return soup obj called result which have all the class with cstor
+results=soup.find_all('div',attrs={'class':'col-xs-6 col-sm-6 col-lg-6 col-md-6 singleBlock'})
+
+print(len(results))
+
+#use a loop to parse through HTML text and get to the data you want to extract
+#it will filter out all the tags and data you do not need
+  
+first_result=results[0]
+print(first_result.contents)
+
+records=[]
+for result in results:
+    url=result.find('a')['href']
+    time=result.find('span').text
+    detail=result.find('h2').text
+    title=result.find('div').text
+    records.append((title,time,detail,url))
+print(records)
+# print(records[0:5])
+
+df=pd.DataFrame(records,columns=['title','time','detail','url'])
+print(df.head())
+print(df.tail())
